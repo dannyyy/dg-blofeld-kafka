@@ -4,7 +4,7 @@ clientId: dg-blofeld-deploy
 topics:
   - dg-blofeld-gamescore-v1:
       dotnetAvroContract: 'Blofeld.GameScoreUpdated'
-      partitions: 1
+      partitions: 2
       topicDescription:
         sourceDeletionBehavior: hard-deletion
         updateTimestampSource: change-timestamp

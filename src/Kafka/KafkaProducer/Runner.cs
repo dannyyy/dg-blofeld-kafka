@@ -7,7 +7,7 @@ namespace KafkaProducer;
 public class Runner
 {
     private readonly IKafkaProducer<long, ISpecificRecord> _kafkaProducer;
-    private readonly HashSet<(int GameId, int UserId)> _deletedGameUsers = new();
+    private readonly HashSet<int> _deletedGames = new();
 
     public Runner(IKafkaProducer<long, ISpecificRecord> kafkaProducer)
     {
@@ -19,9 +19,9 @@ public class Runner
         while (!cancellationToken.IsCancellationRequested)
         {
             var userId = Random.Shared.Next(1, 1000);
-            var gameId = Random.Shared.Next(1, 10);
+            var gameId = Random.Shared.Next(1, 1000);
 
-            if (_deletedGameUsers.Contains((GameId: gameId, UserId: userId)))
+            if (_deletedGames.Contains(gameId))
                 continue;
 
             var gameScore = Random.Shared.NextDouble() > 0.01
@@ -47,9 +47,9 @@ public class Runner
                 message: gameScoreUpdated);
 
             if (gameScore == null)
-                _deletedGameUsers.Add((GameId: gameId, UserId: userId));
+                _deletedGames.Add(gameId);
 
-            await Task.Delay(Random.Shared.Next(250, 1500));
+            await Task.Delay(100);
         }
     }
 }

@@ -4,34 +4,41 @@ using Chabis.EventStreaming;
 
 namespace KafkaConsumer;
 
-[KafkaConsumer(
-    "dg-blofeld-gamescore-v1",
-    RetryStrategy = RetryStrategy.RetryWithExponentialBackOff,
-    MaxRetryAttempts = 2,
-    ErrorAction = ErrorAction.Stop)]
-public class GameScoreUpdatedConsumer : IKafkaMessageConsumer<int, GameScoreUpdated>
+[KafkaConsumer("dg-blofeld-gamescore-v1")]
+public class GameScoreUpdatedConsumer : IKafkaMessageConsumer<long, GameScoreUpdated>
 {
     private static ConcurrentDictionary<int, (int UserId, int HighScore)> HighScore = new();
+    private static ConcurrentBag<int> DeletedGames = new();
 
-    public Task HandleAsync(ConsumerContext<int, GameScoreUpdated> context, CancellationToken cancellationToken)
+    public Task HandleAsync(ConsumerContext<long, GameScoreUpdated> context, CancellationToken cancellationToken)
     {
-        var gameScore = context.Event.Entity;
-
-        if (HighScore.TryGetValue(gameScore.GameId, out var userHighScore))
+        try
         {
-            if (userHighScore.HighScore < gameScore.Score)
-            {
-                UpdateHighscore(gameScore.GameId, gameScore.UserId, gameScore.Score);
-                Console.WriteLine($"[{context.ConsumerName}] New Highscore for game {gameScore.GameId} user {gameScore.UserId} reached {gameScore.Score}");
-            }
+            /*
+             * PLACE YOUR CODE HERE
+             */
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR: {ex.Message}");
         }
 
         return Task.CompletedTask;
     }
 
-    private (int UserId, int HighScore) UpdateHighscore(int gameId, int userId, int highScore)
+    private (int UserId, int HighScore) UpdateHighscore(int gameId, int userId, int highScore, string consumer)
     {
-        return HighScore.AddOrUpdate(
+        /*
+         * DO NOT EDIT THIS
+         */
+
+        if (ShouldFail())
+            throw new InvalidOperationException("Artificial network timeout");
+
+        if (DeletedGames.Contains(gameId))
+            throw new InvalidOperationException($"Game {gameId} has already been deleted");
+
+        var result = HighScore.AddOrUpdate(
             gameId,
             _ => (UserId: userId, HighScore: highScore),
             (gameId, lastUserHighScore) =>
@@ -42,5 +49,36 @@ public class GameScoreUpdatedConsumer : IKafkaMessageConsumer<int, GameScoreUpda
 
                 return (UserId: userId, HighScore: highScore);
             });
+
+        Console.WriteLine($"[{consumer}] New Highscore for game {gameId} user {userId} reached {highScore}");
+
+        return result;
+    }
+
+    private void DeleteHighScore(int gameId, string consumer)
+    {
+        /*
+         * DO NOT EDIT THIS
+         */
+
+        if (ShouldFail())
+            throw new InvalidOperationException("Artificial network timeout");
+
+        if (DeletedGames.Contains(gameId))
+            throw new InvalidOperationException($"Game {gameId} has already been deleted");
+
+        HighScore.TryRemove(gameId, out _);
+        DeletedGames.Add(gameId);
+
+        Console.WriteLine($"[{consumer}] Game {gameId} removed");
+    }
+
+    private bool ShouldFail()
+    {
+        /*
+         * DO NOT EDIT THIS
+         */
+
+        return Random.Shared.NextDouble() < 0.01;
     }
 }

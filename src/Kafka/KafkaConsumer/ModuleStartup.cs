@@ -34,7 +34,7 @@ public class ModuleStartup : ModuleStartupBase<ModuleStartup>
         services.AddKafka(Configuration)
             .ConfigureMiddlewares(middleware => middleware.UseDefaultMiddlewares())
             .WithMultiProtocolSerialization(config => config.AddAvro())
-            .AddKafkaConsumer<GameScoreUpdatedConsumer, int, GameScoreUpdated>();
+            .AddKafkaConsumer<GameScoreUpdatedConsumer, long, GameScoreUpdated>();
 
 
         services.AddScoped<GameScoreUpdatedConsumer>();

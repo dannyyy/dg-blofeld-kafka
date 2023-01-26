@@ -4,7 +4,8 @@
     "KafkaProducer": {
       "commandName": "Project",
       "environmentVariables": {
-      }
+      },
+      "applicationUrl": "http://localhost:5000"
     },
     "KafkaProducer-Deploy": {
       "commandName": "Project",

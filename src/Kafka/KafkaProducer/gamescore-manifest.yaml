@@ -1,0 +1,10 @@
+context: dg.financialreporting
+team: blofeld
+clientId: dg-blofeld-deploy
+topics:
+  - dg-blofeld-gamescore-v1:
+      dotnetAvroContract: 'Blofeld.GameScoreUpdated'
+      partitions: 1
+      topicDescription:
+        sourceDeletionBehavior: hard-deletion
+        updateTimestampSource: change-timestamp

@@ -1,0 +1,19 @@
+@namespace("Blofeld")
+protocol GameScoreUpdated {
+    enum DomainEntityEventType {
+        Unknown, Updated, Deleted
+    }
+
+    record GameScore {
+        int GameId;
+        int UserId;
+        int Score;
+    }
+
+    record GameScoreUpdated {
+        int EntityId;
+        timestamp_ms UpdateDate;
+        DomainEntityEventType EventType;
+        union { null, GameScore } Entity = null;
+    }
+}

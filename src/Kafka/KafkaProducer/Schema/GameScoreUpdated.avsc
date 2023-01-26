@@ -1,0 +1,39 @@
+{
+  "type" : "record",
+  "name" : "GameScoreUpdated",
+  "namespace" : "Blofeld",
+  "fields" : [ {
+    "name" : "EntityId",
+    "type" : "int"
+  }, {
+    "name" : "UpdateDate",
+    "type" : {
+      "type" : "long",
+      "logicalType" : "timestamp-millis"
+    }
+  }, {
+    "name" : "EventType",
+    "type" : {
+      "type" : "enum",
+      "name" : "DomainEntityEventType",
+      "symbols" : [ "Unknown", "Updated", "Deleted" ]
+    }
+  }, {
+    "name" : "Entity",
+    "type" : [ "null", {
+      "type" : "record",
+      "name" : "GameScore",
+      "fields" : [ {
+        "name" : "GameId",
+        "type" : "int"
+      }, {
+        "name" : "UserId",
+        "type" : "int"
+      }, {
+        "name" : "Score",
+        "type" : "int"
+      } ]
+    } ],
+    "default" : null
+  } ]
+}
